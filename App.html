@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Simple Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
+        main {
+            padding: 1rem;
+        }
+        footer {
+            background-color: #333;
+            color: #ff0000;
+            text-align: center;
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Merlins playground</h1>
+    </header>
+    <main>
+        <p> Name: <span id="name"></span></p>
+        <p>Email: <span id="email"></span></p>
+        <button>Click Me</button</button>
+
+        </p>
+        </p>
+    </main>
+    <footer>
+        <p>&copy; 2024 My Simple Website</p>
+    </footer>
+    <script>
+        //variables
+        var name = "Merlin";
+        var email = "merlin@example.com";
+
+           // Get elements by ID and set their content
+           document.getElementById('name').textContent = name;
+        document.getElementById('email').textContent = email;
+
+    </script>
+</body>
+</html>
