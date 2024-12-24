@@ -1,1 +1,2 @@
-Hey will be updated once I figure out what Im doing
+hello
+git push ori
