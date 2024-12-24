@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Simple Website</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+        }
+        .tab-bar {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .tab-bar button {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .tab-bar button:hover {
+            background-color: #f4f4f4;
+        }
+        main {
+            padding: 1rem;
+        }
+        footer {
+            background-color: #333;
+            color: #ff0000;
+            text-align: center;
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Merlins playground</h1>
+        <div class="tab-bar">
+            <button onclick="openHomePage()">Home</button>
+            <button onclick="openRegisterPage()">Register</button>
+            <button onclick="openLoginPage()">Login</button>
+            <button onclick="openUserInfoPage()">User Info</button>
+        </div>
+    </header>
+    <main>
+        <p>Name: <span id="name"></span></p>
+        <p>Email: <span id="email"></span></p>
+        <button>Click Me</button>
+        <p>Generated URL: <a id="generatedUrl" href="#" target="_blank"></a></p>
+    </main>
+    <footer>
+        <p>&copy; 2024 My Simple Website</p>
+    </footer>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp4JnnWr-awxX87pKqxYq93HAxRR5rG-8",
+            authDomain: "benderbattles-401d8.firebaseapp.com",
+            databaseURL: "https://benderbattles-401d8-default-rtdb.firebaseio.com",
+            projectId: "benderbattles-401d8",
+            storageBucket: "benderbattles-401d8.appspot.com",
+            messagingSenderId: "645016379562",
+            appId: "1:645016379562:web:8974987ce6a6353a09f0d3"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Function to check for duplicate email
+        function checkDuplicateEmail(email) {
+            return database.ref('users').orderByChild('email').equalTo(email).once('value').then((snapshot) => {
+                return snapshot.exists();
+            });
+        }
+
+        // Function to update user info page
+        function updateUserInfoPage(userId) {
+            database.ref('users/' + userId).once('value').then((snapshot) => {
+                var userData = snapshot.val();
+                document.getElementById('name').textContent = userData.name;
+                document.getElementById('email').textContent = userData.email;
+            });
+        }
+
+        function openHomePage() {
+            window.location.href = 'index.html';
+        }
+
+        function openRegisterPage() {
+            window.location.href = 'register.html';
+        }
+
+        function openLoginPage() {
+            window.location.href = 'login.html';
+        }
+
+        function openUserInfoPage() {
+            window.location.href = 'userinfo.html';
+        }
+
+        // Retrieve and display saved details
+        window.onload = function() {
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    var userId = user.uid;
+                    var userEmail = user.email;
+
+                    checkDuplicateEmail(userEmail).then((isDuplicate) => {
+                        if (isDuplicate) {
+                            alert('This email is already used by another user.');
+                            auth.signOut();
+                        } else {
+                            updateUserInfoPage(userId);
+                            window.location.href = 'userinfo.html'; // Redirect to user info page
+                        }
+                    });
+                }
+            });
+        };
+
+        // Generate URL
+        var name = "Merlin";
+        var email = "merlin@example.com";
+        var baseUrl = "https://www.example.com/profile?";
+        var url = baseUrl + "name=" + encodeURIComponent(name) + "&email=" + encodeURIComponent(email);
+
+        // Set the generated URL
+        var urlElement = document.getElementById('generatedUrl');
+        urlElement.href = url;
+        urlElement.textContent = url;
+    </script>
+</body>
+</html>

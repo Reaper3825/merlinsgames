@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
+        main {
+            padding: 1rem;
+        }
+        footer {
+            background-color: #333;
+            color: #ff0000;
+            text-align: center;
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+        }
+        .form-box {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .tab-bar {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .tab-bar button {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .tab-bar button:hover {
+            background-color: #f4f4f4;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
+</head>
+<body>
+    <header>
+        <h1 onclick="openHomePage()">Merlins playground</h1>
+        <div class="tab-bar">
+            <button onclick="openRegisterPage()">Register</button>
+            <button onclick="openLoginPage()">Login</button>
+            <button onclick="openUserInfoPage()">User Info</button>
+        </div>
+        <h1>Login</h1>
+    </header>
+    <main>
+        <div class="form-container">
+            <div class="form-box">
+                <form id="loginForm">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" name="loginEmail" required><br><br>
+                    <label for="loginPassword">Password:</label>
+                    <input type="password" id="loginPassword" name="loginPassword" required><br><br>
+                    <button type="submit">Login</button>
+                </form>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Merlin's Playground</p>
+    </footer>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp4JnnWr-awxX87pKqxYq93HAxRR5rG-8",
+            authDomain: "benderbattles-401d8.firebaseapp.com",
+            databaseURL: "https://benderbattles-401d8-default-rtdb.firebaseio.com",
+            projectId: "benderbattles-401d8",
+            storageBucket: "benderbattles-401d8.appspot.com",
+            messagingSenderId: "645016379562",
+            appId: "1:645016379562:web:8974987ce6a6353a09f0d3"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var loginEmail = document.getElementById('loginEmail').value;
+            var loginPassword = document.getElementById('loginPassword').value;
+
+            // Make a JSON request with the user's email and password
+            fetch('https://example.com/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: loginEmail,
+                    password: loginPassword
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Sign in user with Firebase Authentication
+                    auth.signInWithEmailAndPassword(loginEmail, loginPassword)
+                        .then((userCredential) => {
+                            var user = userCredential.user;
+                            alert('Login successful!');
+                            localStorage.setItem('isLoggedIn', 'true');
+                            window.location.href = 'userinfo.html';
+                        })
+                        .catch((error) => {
+                            alert('Error: ' + error.message);
+                        });
+                } else {
+                    alert('Login failed: ' + data.message);
+                }
+            })
+            .catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        });
+
+        function openHomePage() {
+            window.location.href = 'index.html';
+        }
+
+        function openRegisterPage() {
+            window.location.href = 'register.html';
+        }
+
+        function openLoginPage() {
+            window.location.href = 'login.html';
+        }
+
+        function openUserInfoPage() {
+            window.location.href = 'userinfo.html';
+        }
+    </script>
+</body>
+</html>

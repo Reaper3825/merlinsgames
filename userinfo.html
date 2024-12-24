@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+        }
+        main {
+            padding: 1rem;
+        }
+        footer {
+            background-color: #333;
+            color: #ff0000;
+            text-align: center;
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+        .tab-bar {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .tab-bar button {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .tab-bar button:hover {
+            background-color: #f4f4f4;
+        }
+        .icon-container {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            cursor: pointer;
+        }
+        .icon-container img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .icon-container input {
+            display: none;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-storage.js"></script>
+</head>
+<body>
+    <header>
+        <h1 onclick="openHomePage()">User Info</h1>
+        <div class="tab-bar">
+            <button onclick="openRegisterPage()">Register</button>
+            <button onclick="openLoginPage()">Login</button>
+            <button onclick="openUserInfoPage()">User Info</button>
+        </div>
+        <div class="icon-container" onclick="document.getElementById('iconInput').click()">
+            <img id="userIcon" src="default-icon.png" alt="User Icon">
+            <input type="file" id="iconInput" accept="image/*" onchange="uploadIcon()">
+        </div>
+    </header>
+    <main>
+        <p>Name: <span id="name"></span></p>
+        <p>Email: <span id="email"></span></p>
+        <p>Birthday: <span id="birthday"></span></p>
+        <div>
+            <h3>Edit User Icon</h3>
+            <div class="icon-container" onclick="document.getElementById('iconInput').click()">
+                <img id="userIconPreview" src="default-icon.png" alt="User Icon">
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Merlin's Playground</p>
+    </footer>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBp4JnnWr-awxX87pKqxYq93HAxRR5rG-8",
+            authDomain: "benderbattles-401d8.firebaseapp.com",
+            databaseURL: "https://benderbattles-401d8-default-rtdb.firebaseio.com",
+            projectId: "benderbattles-401d8",
+            storageBucket: "benderbattles-401d8.appspot.com",
+            messagingSenderId: "645016379562",
+            appId: "1:645016379562:web:8974987ce6a6353a09f0d3"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        const storage = firebase.storage();
+
+        // Check if the user is logged in
+        window.onload = function() {
+            var isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                alert('You need to log in to view this page.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Retrieve and display saved details
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    var userId = user.uid;
+                    database.ref('users/' + userId).once('value').then((snapshot) => {
+                        var userData = snapshot.val();
+                        document.getElementById('name').textContent = userData.name;
+                        document.getElementById('email').textContent = userData.email;
+                        document.getElementById('birthday').textContent = userData.birthday;
+                        if (userData.iconUrl) {
+                            document.getElementById('userIcon').src = userData.iconUrl;
+                            document.getElementById('userIconPreview').src = userData.iconUrl;
+                        } else {
+                            document.getElementById('userIcon').src = 'default-icon.png';
+                            document.getElementById('userIconPreview').src = 'default-icon.png';
+                        }
+                    });
+                }
+            });
+        };
+
+        function uploadIcon() {
+            var file = document.getElementById('iconInput').files[0];
+            var user = auth.currentUser;
+            if (user && file) {
+                var storageRef = storage.ref('icons/' + user.uid + '/' + file.name);
+                storageRef.put(file).then(() => {
+                    storageRef.getDownloadURL().then((url) => {
+                        database.ref('users/' + user.uid).update({ iconUrl: url });
+                        document.getElementById('userIcon').src = url;
+                        document.getElementById('userIconPreview').src = url;
+                    });
+                });
+            }
+        }
+
+        function openHomePage() {
+            window.location.href = 'index.html';
+        }
+
+        function openRegisterPage() {
+            window.location.href = 'register.html';
+        }
+
+        function openLoginPage() {
+            window.location.href = 'login.html';
+        }
+
+        function openUserInfoPage() {
+            window.location.href = 'userinfo.html';
+        }
+    </script>
+</body>
+</html>
